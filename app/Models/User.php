@@ -24,6 +24,13 @@ class User extends Authenticatable
         'password',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            $user->createToken('api-token')->plainTextToken;
+        });
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

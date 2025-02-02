@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
 const ProductList = () => {
@@ -5,18 +6,25 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    async function fetchProducts(url = 'http://127.0.0.1:8000/api/products') {
+    async function fetchProducts(url = 'http://daw-dsw--laravel-react.test/api/products') {
         try {
-            const response = await fetch(`${url}`, {
+            const token = document.cookie;
+            const response = await axios.get(`${url}`, {
                 credentials: 'include',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                maxRedirects: 5,
+                followRedirects: true
             });
+            /*             if (response.redirected) {
+                            window.location.href = response.url;
+                            return;
+                        } */
             console.log(response);
+            console.log(response.data.data);
             setProducts(response.data); // Asumiendo que los datos están en response.data.data
             setLoading(false);
-            if (response.redirected) {
-                window.location.href = response.url;
-                return;
-            }
         } catch (err) {
             setError(err.message);
             setLoading(false);
