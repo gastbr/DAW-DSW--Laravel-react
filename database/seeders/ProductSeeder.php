@@ -13,6 +13,15 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
+        Product::factory()->create(
+            [
+                'name' => 'Product 1',
+                'description' => 'Description 1',
+                'price' => 10.99,
+                'image' => 'https://picsum.photos/200/300',
+                'user_id' => 2
+            ]
+        );
         Product::factory(50)->create();
     }
 }
