@@ -1,14 +1,40 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
-const ProductList = () => {
+export default function ProductList() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    async function fetchProducts(url = 'http://daw-dsw--laravel-react.test/api/products') {
+    const deleteProduct = async (productId) => {
+        if (!window.confirm("¿Estás seguro de que quieres eliminar este producto?")) return;
         try {
-            const token = document.cookie;
+            await axios.get("/sanctum/csrf-cookie");
+            await axios.delete(`/api/products/${productId}`, { withCredentials: true });
+            alert("Producto eliminado correctamente");
+            setProducts(products.filter(product => product.id !== productId));
+        } catch (err) {
+            if (err.response) {
+                if (err.response.status === 403) {
+                    alert('No tienes permiso para eliminar este producto.');
+                } else {
+                    alert('Error al eliminar el producto.');
+                    setError(err.message);
+                    setLoading(false);
+                }
+            } else {
+                alert('Error al obtener los productos.');
+                setError(err.message);
+                setLoading(false);
+            }
+        }
+    };
+
+
+    async function fetchProducts(url = './api/products') {
+        try {
+            await axios.get("/sanctum/csrf-cookie");
+            const token = localStorage.getItem('token');
             const response = await axios.get(`${url}`, {
                 credentials: 'include',
                 headers: {
@@ -17,12 +43,13 @@ const ProductList = () => {
                 maxRedirects: 5,
                 followRedirects: true
             });
-            /*             if (response.redirected) {
-                            window.location.href = response.url;
-                            return;
-                        } */
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
             console.log(response);
             console.log(response.data.data);
+
             setProducts(response.data); // Asumiendo que los datos están en response.data.data
             setLoading(false);
         } catch (err) {
@@ -43,12 +70,14 @@ const ProductList = () => {
             <h2>Product List</h2>
             <ul className='flex flex-wrap'>
                 {products.data.map(product => (
-                    <li className='border border-gray-300 p-4' key={product.id}>
+                    <li className='border border-gray-300 p-4 w-1/4' key={product.id}>
                         <img src={product.image} alt={product.name} />
                         <h3>{product.name}</h3>
                         <p>{product.description}</p>
                         <p>Price: ${product.price}</p>
                         <p>Quantity: {product.quantity}</p>
+                        <p>User: {product.name}</p>
+                        <button className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded' onClick={() => deleteProduct(product.id)}>Delete</button>
                     </li>
                 ))}
             </ul>
@@ -64,5 +93,3 @@ const ProductList = () => {
         </div>
     );
 };
-
-export default ProductList;

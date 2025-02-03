@@ -15,20 +15,18 @@ return [
     |
     */
 
-    'paths' => ['*'],
 
-    'allowed_methods' => ['*'],
+    'paths' => ['api/*'], // Permite CORS solo para rutas que coincidan con este patrón.
 
-    'allowed_origins' => ['*'],
+    'allowed_methods' => ['*'], // Permite todos los métodos HTTP.
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins' => ['http://laravel-react.test'], // Agrega aquí el origen de tu cliente.
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['*'], // Permite todos los encabezados.
 
     'exposed_headers' => [],
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
-
+    'supports_credentials' => true, // Habilita cookies y autenticación basada en sesiones.
 ];
